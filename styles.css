@@ -137,6 +137,167 @@ h1, h2, h3, h4 {
     margin-bottom: 0.5rem;
 }
 
+/* ===== Footer ===== */
+.footer {
+    position: relative;
+    background: radial-gradient(1200px 600px at 10% -20%, rgba(118,75,162,0.20) 0%, rgba(118,75,162,0) 60%),
+                radial-gradient(1200px 600px at 90% 120%, rgba(102,126,234,0.18) 0%, rgba(102,126,234,0) 60%),
+                #0f1222; /* fallback */
+    color: #e7e9ee;
+    padding: 72px 0 24px;
+    overflow: hidden;
+}
+
+.footer::before {
+    /* linha sutil no topo do footer */
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(118,75,162,0) 0%, rgba(118,75,162,0.6) 35%, rgba(102,126,234,0.6) 65%, rgba(102,126,234,0) 100%);
+    top: 0;
+    opacity: 0.7;
+}
+
+.footer .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Footer Content agora centralizado */
+.footer-content {
+    display: flex;              /* muda de grid para flex */
+    justify-content: center;    /* centraliza no eixo horizontal */
+    gap: 4rem;                  /* espaço entre as colunas */
+    text-align: left;           /* mantém o texto alinhado */
+}
+
+.footer-links {
+    display: flex;
+    gap: 4rem;                  /* espaço entre os grupos Produto, Suporte, Legal */
+}
+
+/* Cada coluna fica empilhada */
+.footer-column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* bloco principal
+.footer-content {
+    display: grid;
+    grid-template-columns: 1.2fr 2fr;
+    gap: 4rem;
+    align-items: start;
+} */
+
+@media (max-width: 900px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: left;
+    }
+}
+
+/* marca */
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.footer-brand p {
+    color: #b7bcc9;
+    font-size: 0.98rem;
+}
+
+/* colunas de links
+.footer-links {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(140px, 1fr));
+    gap: 2rem;
+} */
+
+@media (max-width: 680px) {
+    .footer-links {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem 2rem;
+    }
+}
+@media (max-width: 440px) {
+    .footer-links {
+        grid-template-columns: 1fr;
+    }
+}
+
+.footer-column h4 {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    font-size: 1.05rem;
+    color: #ffffff;
+    margin-bottom: 0.9rem;
+}
+
+.footer-column a {
+    display: block;   /* força cada link ficar em linha separada */
+    text-decoration: none;
+    color: #c8ccda;
+    font-weight: 500;
+    font-size: 0.98rem;
+    margin: 0.35rem 0;
+    transition: color .25s ease, transform .25s ease;
+    outline: none;
+}
+
+.footer-column a:hover,
+.footer-column a:focus-visible {
+    color: #aeb7ff;
+    transform: translateX(2px);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* logotipos no footer já existem; só ajustamos na cor de fundo escura */
+.footer-logo {
+    height: 56px;
+    width: auto;
+    filter: drop-shadow(0 6px 18px rgba(0,0,0,0.35));
+}
+
+/* barra inferior */
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 48px;
+    padding-top: 18px;
+    text-align: center;
+}
+
+.footer-bottom p {
+    color: #a6acc5;
+    font-size: 0.92rem;
+}
+
+/* link de email destacado sem quebrar a identidade */
+.footer a[href^="mailto:"] {
+    color: #cfd5ff;
+}
+.footer a[href^="mailto:"]:hover {
+    color: #ffffff;
+}
+
+/* acessibilidade: foco visível nos links */
+.footer a:focus-visible {
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.45);
+    border-radius: 6px;
+}
+
+/* melhora contraste dos textos dentro de itens escuros herdados */
+.footer .footer-column,
+.footer .footer-brand {
+    color: #e7e9ee;
+}
+
 .nav-links {
     display: flex;
     gap: 2rem;
@@ -343,7 +504,11 @@ h1, h2, h3, h4 {
     color: rgba(255, 255, 255, 0.9);
 }
 
-
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
 
 /* Pricing Section */
 .pricing {
