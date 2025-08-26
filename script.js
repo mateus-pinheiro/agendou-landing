@@ -1,20 +1,130 @@
-// Smooth scrolling para links de navegação
-document.addEventListener('DOMContentLoaded', function () {
-    // Smooth scrolling para links internos
-    const links = document.querySelectorAll('a[href^="#"]');
-
-    links.forEach(link => {
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-
-            const targetId = this.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-
-            if (targetSection) {
-                targetSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+// Popup functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const popupOverlay = document.getElementById('popup-overlay');
+    const popupClose = document.getElementById('popup-close');
+    const signupForm = document.getElementById('signup-form');
+    const telefoneInput = document.getElementById('telefone');
+    
+    // Botões que abrem o popup
+    const triggerButtons = document.querySelectorAll('a[href="#precos"], .btn-primary');
+    
+    // Função para abrir o popup
+    function openPopup() {
+        popupOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Previne scroll da página
+    }
+    
+    // Função para fechar o popup
+    function closePopup() {
+        popupOverlay.classList.remove('active');
+        document.body.style.overflow = ''; // Restaura scroll da página
+        signupForm.reset(); // Limpa o formulário
+    }
+    
+    // Event listeners para abrir o popup
+    triggerButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            // Só abre o popup se for um botão de teste grátis
+            if (this.textContent.includes('teste') || this.textContent.includes('Quero') || this.textContent.includes('Começar')) {
+                e.preventDefault();
+                openPopup();
+            }
+        });
+    });
+    
+    // Event listener para fechar o popup
+    popupClose.addEventListener('click', closePopup);
+    
+    // Fechar popup clicando fora dele
+    popupOverlay.addEventListener('click', function(e) {
+        if (e.target === popupOverlay) {
+            closePopup();
+        }
+    });
+    
+    // Fechar popup com tecla ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && popupOverlay.classList.contains('active')) {
+            closePopup();
+        }
+    });
+    
+    // Máscara para telefone
+    telefoneInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.length <= 11) {
+            if (value.length <= 2) {
+                value = value.replace(/(\d{0,2})/, '($1');
+            } else if (value.length <= 7) {
+                value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+            } else {
+                value = value.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+            }
+        }
+        
+        e.target.value = value;
+    });
+    
+    // Validação e envio do formulário
+    signupForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const nome = document.getElementById('nome').value.trim();
+        const telefone = document.getElementById('telefone').value.trim();
+        const email = document.getElementById('email').value.trim();
+        
+        // Validações básicas
+        if (!nome || nome.length < 2) {
+            alert('Por favor, digite seu nome completo.');
+            return;
+        }
+        
+        if (!telefone || telefone.replace(/\D/g, '').length < 10) {
+            alert('Por favor, digite um telefone válido com DDD.');
+            return;
+        }
+        
+        if (!email || !isValidEmail(email)) {
+            alert('Por favor, digite um e-mail válido.');
+            return;
+        }
+        
+        // Simula envio do formulário
+        const submitButton = signupForm.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        
+        submitButton.textContent = 'Enviando...';
+        submitButton.disabled = true;
+        
+        // Simula delay de envio
+        setTimeout(() => {
+            alert('Cadastro realizado com sucesso! Em breve entraremos em contato.');
+            closePopup();
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+        }, 2000);
+    });
+    
+    // Função para validar e-mail
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
+    // Smooth scroll para navegação
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            // Só faz smooth scroll se não for um botão de popup
+            if (!this.textContent.includes('teste') && !this.textContent.includes('Quero') && !this.textContent.includes('Começar')) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             }
         });
     });
@@ -25,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
         rootMargin: '0px 0px -50px 0px'
     };
 
-    const observer = new IntersectionObserver(function (entries) {
+    const observer = new IntersectionObserver(function(entries) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = '1';
@@ -36,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Observar elementos para animação
     const animatedElements = document.querySelectorAll('.step, .audience-item, .benefit-item, .pricing-card');
-
+    
     animatedElements.forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
@@ -45,10 +155,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Efeito parallax sutil no hero
-    window.addEventListener('scroll', function () {
+    window.addEventListener('scroll', function() {
         const scrolled = window.pageYOffset;
         const heroImage = document.querySelector('.hero-img');
-
+        
         if (heroImage && scrolled < window.innerHeight) {
             heroImage.style.transform = `translateY(${scrolled * 0.3}px)`;
         }
@@ -56,8 +166,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Navbar background change on scroll
     const header = document.querySelector('.header');
-
-    window.addEventListener('scroll', function () {
+    
+    window.addEventListener('scroll', function() {
         if (window.scrollY > 100) {
             header.style.background = 'rgba(255, 255, 255, 0.98)';
             header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
@@ -69,13 +179,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Adicionar efeito hover nos botões CTA
     const ctaButtons = document.querySelectorAll('.btn-primary');
-
+    
     ctaButtons.forEach(button => {
-        button.addEventListener('mouseenter', function () {
+        button.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-3px) scale(1.02)';
         });
-
-        button.addEventListener('mouseleave', function () {
+        
+        button.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(-2px) scale(1)';
         });
     });
