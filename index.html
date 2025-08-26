@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agendou - Sua agenda, agora inteligente</title>
-    <meta name="description" content="Deixe que a Gê, sua nova assistente virtual, cuide dos seus agendamentos para que você possa focar no que realmente importa: seus clientes.">
+    <meta name="description"
+        content="Deixe que a Gê, sua nova assistente virtual, cuide dos seus agendamentos para que você possa focar no que realmente importa: seus clientes.">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
@@ -18,12 +23,18 @@
                 <div class="logo">
                     <img src="logo_final.png" alt="Agendou.ai" class="logo-img">
                 </div>
-                <nav class="nav-links">
+
+                <nav class="nav-links" id="primary-nav">
                     <a href="#como-funciona">Como funciona</a>
                     <a href="#beneficios">Benefícios</a>
                     <a href="#precos">Preços</a>
                     <a href="#contato" class="btn-secondary">Contato</a>
                 </nav>
+
+                <!-- botão hambúrguer -->
+                <button class="hamburger" aria-controls="primary-nav" aria-expanded="false" aria-label="Abrir menu">
+                    <span></span><span></span><span></span>
+                </button>
             </div>
         </div>
     </header>
@@ -34,7 +45,8 @@
             <div class="hero-content">
                 <div class="hero-text">
                     <h1 class="hero-title">Sua agenda, agora <span class="highlight">inteligente</span>.</h1>
-                    <p class="hero-subtitle">Deixe que a Gê, sua nova assistente virtual, cuide dos seus agendamentos para que você possa focar no que realmente importa: seus clientes.</p>
+                    <p class="hero-subtitle">Deixe que a Gê, sua nova assistente virtual, cuide dos seus agendamentos
+                        para que você possa focar no que realmente importa: seus clientes.</p>
                     <div class="hero-cta">
                         <a href="#precos" class="btn-primary">Quero um teste grátis</a>
                         <a href="#como-funciona" class="btn-outline">Ver como funciona</a>
@@ -52,8 +64,10 @@
         <div class="container">
             <div class="section-content">
                 <h2 class="section-title">Chega de perder tempo (e clientes) no WhatsApp.</h2>
-                <p class="section-description">Responder mensagens, verificar horários, confirmar agendamentos... Essas tarefas consomem um tempo precioso. A Gê automatiza todo o processo de agendamento via Google Calendar, trabalhando 24/7 para você.</p>
-                
+                <p class="section-description">Responder mensagens, verificar horários, confirmar agendamentos... Essas
+                    tarefas consomem um tempo precioso. A Gê automatiza todo o processo de agendamento via Google
+                    Calendar, trabalhando 24/7 para você.</p>
+
                 <div class="benefits-grid">
                     <div class="benefit-item">
                         <div class="benefit-icon">✅</div>
@@ -104,7 +118,8 @@
                     <div class="step-number">3</div>
                     <div class="step-content">
                         <h3>Pronto! O evento é criado</h3>
-                        <p>O agendamento aparece magicamente na sua agenda, e tanto você quanto o cliente são notificados.</p>
+                        <p>O agendamento aparece magicamente na sua agenda, e tanto você quanto o cliente são
+                            notificados.</p>
                     </div>
                 </div>
             </div>
@@ -209,5 +224,5 @@
 
     <script src="script.js"></script>
 </body>
-</html>
 
+</html>
