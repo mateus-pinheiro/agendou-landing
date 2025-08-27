@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const telefoneInput = document.getElementById('telefone');
 
     // Botões que abrem o popup
-    const triggerButtons = document.querySelectorAll('a[href="#precos"], .btn-primary');
+    const triggerButtons = document.querySelectorAll('a[href="#precos"], a.btn-primary');
+
 
     // Função para abrir o popup
     function openPopup() {
@@ -28,8 +29,15 @@ document.addEventListener('DOMContentLoaded', function () {
     // Event listeners para abrir o popup
     triggerButtons.forEach(button => {
         button.addEventListener('click', function (e) {
-            // Só abre o popup se for um botão de teste grátis
-            if (this.textContent.includes('teste') || this.textContent.includes('Quero') || this.textContent.includes('Começar')) {
+            // não hijackar clique dentro do popup
+            if (this.closest('#popup-overlay')) return;
+
+            // só abrir popup se for ANCHOR e for CTA
+            const isAnchor = this.tagName === 'A';
+            const txt = this.textContent || '';
+            const isCta = txt.includes('teste') || txt.includes('Quero') || txt.includes('Começar');
+
+            if (isAnchor && isCta) {
                 e.preventDefault();
                 openPopup();
             }
@@ -73,6 +81,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Validação e envio do formulário
     signupForm.addEventListener('submit', async function (e) {
         e.preventDefault();
+
+        console.log('Enviando formulário...');
 
         const nome = document.getElementById('nome').value.trim();
         const telefone = document.getElementById('telefone').value.trim();
