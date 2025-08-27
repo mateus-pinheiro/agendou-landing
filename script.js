@@ -1,29 +1,33 @@
+// util p/ capturar UTM e afins
+const q = new URLSearchParams(location.search);
+const getQuery = (k) => q.get(k) || null;
+
 // Popup functionality
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const popupOverlay = document.getElementById('popup-overlay');
     const popupClose = document.getElementById('popup-close');
     const signupForm = document.getElementById('signup-form');
     const telefoneInput = document.getElementById('telefone');
-    
+
     // Botões que abrem o popup
     const triggerButtons = document.querySelectorAll('a[href="#precos"], .btn-primary');
-    
+
     // Função para abrir o popup
     function openPopup() {
         popupOverlay.classList.add('active');
         document.body.style.overflow = 'hidden'; // Previne scroll da página
     }
-    
+
     // Função para fechar o popup
     function closePopup() {
         popupOverlay.classList.remove('active');
         document.body.style.overflow = ''; // Restaura scroll da página
         signupForm.reset(); // Limpa o formulário
     }
-    
+
     // Event listeners para abrir o popup
     triggerButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
+        button.addEventListener('click', function (e) {
             // Só abre o popup se for um botão de teste grátis
             if (this.textContent.includes('teste') || this.textContent.includes('Quero') || this.textContent.includes('Começar')) {
                 e.preventDefault();
@@ -31,28 +35,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
     // Event listener para fechar o popup
     popupClose.addEventListener('click', closePopup);
-    
+
     // Fechar popup clicando fora dele
-    popupOverlay.addEventListener('click', function(e) {
+    popupOverlay.addEventListener('click', function (e) {
         if (e.target === popupOverlay) {
             closePopup();
         }
     });
-    
+
     // Fechar popup com tecla ESC
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && popupOverlay.classList.contains('active')) {
             closePopup();
         }
     });
-    
+
     // Máscara para telefone
-    telefoneInput.addEventListener('input', function(e) {
+    telefoneInput.addEventListener('input', function (e) {
         let value = e.target.value.replace(/\D/g, '');
-        
+
         if (value.length <= 11) {
             if (value.length <= 2) {
                 value = value.replace(/(\d{0,2})/, '($1');
@@ -62,56 +66,99 @@ document.addEventListener('DOMContentLoaded', function() {
                 value = value.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
             }
         }
-        
+
         e.target.value = value;
     });
-    
+
     // Validação e envio do formulário
-    signupForm.addEventListener('submit', function(e) {
+    signupForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
+
         const nome = document.getElementById('nome').value.trim();
         const telefone = document.getElementById('telefone').value.trim();
         const email = document.getElementById('email').value.trim();
-        
+
         // Validações básicas
         if (!nome || nome.length < 2) {
             alert('Por favor, digite seu nome completo.');
             return;
         }
-        
+
         if (!telefone || telefone.replace(/\D/g, '').length < 10) {
             alert('Por favor, digite um telefone válido com DDD.');
             return;
         }
-        
+
         if (!email || !isValidEmail(email)) {
             alert('Por favor, digite um e-mail válido.');
             return;
         }
-        
-        // Simula envio do formulário
+
         const submitButton = signupForm.querySelector('button[type="submit"]');
         const originalText = submitButton.textContent;
-        
         submitButton.textContent = 'Enviando...';
         submitButton.disabled = true;
-        
-        // Simula delay de envio
-        setTimeout(() => {
-            alert('Cadastro realizado com sucesso! Em breve entraremos em contato.');
-            closePopup();
+
+        // Monta o payload para o n8n
+        const payload = {
+            name: nome,
+            email: email.toLowerCase(),
+            phone: telefone.replace(/\D/g, ''), // só dígitos
+            page: location.href,
+            utm_source: getQuery('utm_source'),
+            utm_medium: getQuery('utm_medium'),
+            utm_campaign: getQuery('utm_campaign'),
+            timestamp: new Date().toISOString()
+        };
+
+        // Timeout opcional (10s)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+        try {
+            const res = await fetch('https://n8n.gochats.com.br/webhook-test/register-provider', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 'x-api-key': 'SUA_CHAVE_PUBLICA' // simples shared key (não use segredo aqui)
+                },
+                body: JSON.stringify(payload),
+                mode: 'cors',
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!res.ok) {
+                const text = await res.text().catch(() => '');
+                throw new Error(`Falha no envio (${res.status}). ${text}`);
+            }
+
+            // se seu Webhook responder JSON:
+            const data = await res.json().catch(() => ({}));
+
+            alert(data.message || 'Cadastro realizado com sucesso! Em breve entraremos em contato.');
+            signupForm.reset();
+            if (typeof closePopup === 'function') closePopup();
+        } catch (err) {
+            if (err.name === 'AbortError') {
+                alert('Tempo de conexão esgotado. Tente novamente.');
+            } else {
+                console.error(err);
+                alert('Não foi possível enviar agora. Tente novamente em instantes.');
+            }
+        } finally {
             submitButton.textContent = originalText;
             submitButton.disabled = false;
-        }, 2000);
+        }
     });
-    
+
     // Função para validar e-mail
     function isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
-    
+
     // Smooth scroll para navegação
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -135,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
         rootMargin: '0px 0px -50px 0px'
     };
 
-    const observer = new IntersectionObserver(function(entries) {
+    const observer = new IntersectionObserver(function (entries) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = '1';
@@ -146,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Observar elementos para animação
     const animatedElements = document.querySelectorAll('.step, .audience-item, .benefit-item, .pricing-card');
-    
+
     animatedElements.forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
@@ -155,10 +202,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Efeito parallax sutil no hero
-    window.addEventListener('scroll', function() {
+    window.addEventListener('scroll', function () {
         const scrolled = window.pageYOffset;
         const heroImage = document.querySelector('.hero-img');
-        
+
         if (heroImage && scrolled < window.innerHeight) {
             heroImage.style.transform = `translateY(${scrolled * 0.3}px)`;
         }
@@ -166,8 +213,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Navbar background change on scroll
     const header = document.querySelector('.header');
-    
-    window.addEventListener('scroll', function() {
+
+    window.addEventListener('scroll', function () {
         if (window.scrollY > 100) {
             header.style.background = 'rgba(255, 255, 255, 0.98)';
             header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
@@ -179,13 +226,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Adicionar efeito hover nos botões CTA
     const ctaButtons = document.querySelectorAll('.btn-primary');
-    
+
     ctaButtons.forEach(button => {
-        button.addEventListener('mouseenter', function() {
+        button.addEventListener('mouseenter', function () {
             this.style.transform = 'translateY(-3px) scale(1.02)';
         });
-        
-        button.addEventListener('mouseleave', function() {
+
+        button.addEventListener('mouseleave', function () {
             this.style.transform = 'translateY(-2px) scale(1)';
         });
     });
@@ -313,33 +360,33 @@ function showNotification(message, type = 'info') {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  // ... (seu código atual)
+    // ... (seu código atual)
 
-  // === Mobile menu (hambúrguer) ===
-  const btn = document.querySelector('.hamburger');
-  const nav = document.getElementById('primary-nav');
+    // === Mobile menu (hambúrguer) ===
+    const btn = document.querySelector('.hamburger');
+    const nav = document.getElementById('primary-nav');
 
-  if (btn && nav) {
-    btn.addEventListener('click', () => {
-      const isOpen = nav.classList.toggle('open');
-      btn.classList.toggle('active', isOpen);
-      btn.setAttribute('aria-expanded', String(isOpen));
-      document.body.classList.toggle('no-scroll', isOpen);
-    });
+    if (btn && nav) {
+        btn.addEventListener('click', () => {
+            const isOpen = nav.classList.toggle('open');
+            btn.classList.toggle('active', isOpen);
+            btn.setAttribute('aria-expanded', String(isOpen));
+            document.body.classList.toggle('no-scroll', isOpen);
+        });
 
-    // Fecha ao clicar em um link do menu
-    nav.addEventListener('click', (e) => {
-      const link = e.target.closest('a');
-      if (link && nav.classList.contains('open')) {
-        nav.classList.remove('open');
-        btn.classList.remove('active');
-        btn.setAttribute('aria-expanded', 'false');
-        document.body.classList.remove('no-scroll');
-      }
-    });
-  } else {
-    console.warn('Hamburger ou nav não encontrados.');
-  }
+        // Fecha ao clicar em um link do menu
+        nav.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (link && nav.classList.contains('open')) {
+                nav.classList.remove('open');
+                btn.classList.remove('active');
+                btn.setAttribute('aria-expanded', 'false');
+                document.body.classList.remove('no-scroll');
+            }
+        });
+    } else {
+        console.warn('Hamburger ou nav não encontrados.');
+    }
 });
 
 
